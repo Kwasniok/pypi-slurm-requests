@@ -25,16 +25,16 @@ class _Defaults:
     """Configuration for SLURM requests."""
 
     # REST
-    url: str = ""
+    url: str | None = None
     """URL to SLURM server (e.g. `https://example.com/sapi`)."""
 
-    api_version: str = ""
+    api_version: str | None = None
     """API version to use for SLURM requests (e.g. `v0.0.40`)."""
 
-    user_name: str = ""
+    user_name: str | None = None
     """User name for SLURM authentication."""
 
-    user_token: str = ""
+    user_token: str | None = None
     """User token for SLURM authentication."""
 
     headers: dict[str, str] = {}
@@ -169,6 +169,9 @@ async def request(
 
     Returns:
         response: `<method> /<midpoint>/<api_version>/<endpoint>` response data (see https://slurm.schedmd.com/rest_api.html)
+
+    Raises:
+        RuntimeError: no URL or API version is provided.
     """
 
     url = url or default.url
@@ -179,29 +182,24 @@ async def request(
     proxy_url = proxy_url or default.proxy_url
     dry_run = dry_run if dry_run is not None else default.dry_run
 
-    if url == "":
+    if url is None:
         raise RuntimeError(
             "SLURM request URL is not set. Specify 'url' or call 'init_defaults' first."
         )
-    if api_version == "":
+    if api_version is None:
         raise RuntimeError(
             "SLURM API version is not set. Specify 'api_version' or call 'init_defaults' first."
         )
-    if user_name == "":
-        raise RuntimeError(
-            "SLURM user name is not set. Specify 'user_name' or call 'init_defaults' first."
-        )
-    if user_token == "":
-        raise RuntimeError(
-            "SLURM user token is not set. Specify 'user_token' or call 'init_defaults' first."
-        )
 
     full_url = f"{url}/{midpoint}/{api_version}/{endpoint}"
-    full_headers = {
-        "Content-Type": "application/json",
-        "X-SLURM-USER-NAME": user_name,
-        "X-SLURM-USER-TOKEN": user_token,
-    } | headers
+    full_headers = (
+        {
+            "Content-Type": "application/json",
+        }
+        | ({"X-SLURM-USER-NAME": user_name} if user_name else {})
+        | ({"X-SLURM-USER-TOKEN": user_token} if user_token else {})
+        | headers
+    )
 
     try:
         response = await _rest_request(

@@ -115,6 +115,52 @@ async def test_request():
 
 
 @pytest.mark.asyncio
+async def test_request_api_version_constraint():
+
+    slurm.default.url = "http://example.com"
+    slurm.default.api_version = None
+    slurm.default.user_name = "test_user"
+    slurm.default.user_token = "test_token"
+    slurm.default.partition = "test_partition"
+    slurm.default.constraints = "test_constraints"
+    slurm.default.environment = ["VAR1=value1", "VAR2=value2"]
+    slurm.default.headers = {"X-Custom-Header": "value"}
+    slurm.default.proxy_url = None
+    slurm.default.dry_run = False
+
+    with pytest.raises(RuntimeError):
+        await slurm.request(
+            RequestMethod.GET,
+            midpoint="slurm",
+            endpoint="ping",
+            api_version=None,
+        )
+
+
+@pytest.mark.asyncio
+async def test_request_url_constraints():
+
+    slurm.default.url = None
+    slurm.default.api_version = "v1.2.3"
+    slurm.default.user_name = "test_user"
+    slurm.default.user_token = "test_token"
+    slurm.default.partition = "test_partition"
+    slurm.default.constraints = "test_constraints"
+    slurm.default.environment = ["VAR1=value1", "VAR2=value2"]
+    slurm.default.headers = {"X-Custom-Header": "value"}
+    slurm.default.proxy_url = None
+    slurm.default.dry_run = False
+
+    with pytest.raises(RuntimeError):
+        await slurm.request(
+            RequestMethod.GET,
+            midpoint="slurm",
+            endpoint="ping",
+            url=None,
+        )
+
+
+@pytest.mark.asyncio
 async def test_relay_to_request():
 
     # all default
