@@ -5,7 +5,7 @@
 
 -----
 
-Asynchronous SLURM REST requests with proxy support.
+Lightweight asynchronous SLURM REST requests with proxy support.
 
 ## Installation
 
