@@ -40,6 +40,9 @@ class _Defaults:
     headers: dict[str, str] = {}
     """Headers to include in SLURM requests."""
 
+    timeout: int | None = 600
+    """Default request timeout in seconds."""
+
     proxy_url: str | None = None
     """If provided, the URL of the proxy server to use for the requests. E.g. "socks5://localhost:8080"."""
 
@@ -106,6 +109,7 @@ def init_defaults(
     constraints: str | None = None,
     environment: list[str] | None = None,
     headers: dict[str, str] | None = None,
+    timeout: int | None = None,
     proxy_url: str | None = None,
     dry_run: bool = False,
 ) -> None:
@@ -120,6 +124,7 @@ def init_defaults(
         partition: Default SLURM partition to submit jobs to.
         environment: Default SLURM environment variables for job submission.
         headers: Additional headers to include in SLURM requests.
+        timeout: Default request timeout in seconds.
         proxy_url: If provided, the URL of the proxy server to use for the requests. E.g. "socks5://localhost:8080".
     """
 
@@ -137,6 +142,7 @@ def init_defaults(
     default.user_name = user_name
     default.user_token = user_token
     default.headers = headers or {}
+    default.timeout = timeout
     default.proxy_url = proxy_url
     # SLURM
     default.partition = partition
@@ -157,6 +163,7 @@ async def request(
     user_token: str | None = None,
     headers: dict[str, str] | None = None,
     body: JSON = {},
+    timeout: int | None = None,
     proxy_url: str | None = None,
     dry_run: bool | None = None,
 ) -> str | JSON:
@@ -207,6 +214,7 @@ async def request(
             url=full_url,
             headers=full_headers,
             body=body,
+            **(dict(timeout=timeout) if timeout is not None else {}),
             proxy_url=proxy_url,
             dry_run=dry_run,
         )
