@@ -15,7 +15,7 @@ from enum import Enum
 from typing import Any
 
 from aiohttp import ClientResponseError
-from rest_requests import JSON, RequestMethod
+from rest_requests import JSON, json_diff, RequestMethod
 from rest_requests import request as _rest_request
 
 _logger = logging.getLogger(__name__)
