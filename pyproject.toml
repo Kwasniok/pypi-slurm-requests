@@ -29,7 +29,7 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
 ]
 dependencies = [
-  "rest-requests>=1.1.0",
+  "rest-requests>=2.0.0",
 ]
 
 [project.urls]
